@@ -1,0 +1,50 @@
+{
+  "architecture": "android-arm64",
+  "clashUidGid": "0:3005",
+  "apMode": false,
+  "startWithClash": true,
+  "forwardUpdateKernel": true,
+  "autoUpdateGeoX": true,
+  "geoxInterval": 86400000,
+  "bindHost": "0.0.0.0",
+  "authorizationKey": "node",
+  "mirrorTimeOut": 2000,
+  "mirrors": [
+    {
+      "bodyHead": "https://hub.fastgit.xyz/",
+      "downHead": "https://download.fastgit.org/"
+    },
+    {
+      "bodyHead": "https://gh.api.99988866.xyz/http://github.com/",
+      "downHead": "https://gh.api.99988866.xyz/http://github.com/"
+    },
+    {
+      "bodyHead": "https://ghgo.feizhuqwq.workers.dev/http://github.com/",
+      "downHead": "https://ghgo.feizhuqwq.workers.dev/http://github.com/"
+    },
+    {
+      "bodyHead": "https://github.rc1844.workers.dev/",
+      "downHead": "https://github.rc1844.workers.dev/"
+    },
+    {
+      "bodyHead": "https://gh.api.99988866.xyz/https://github.com/",
+      "downHead": "https://gh.api.99988866.xyz/https://github.com/"
+    },
+    {
+      "bodyHead": "https://gh.ddlc.top/https://github.com/",
+      "downHead": "https://gh.ddlc.top/https://github.com/"
+    },
+    {
+      "bodyHead": "https://proxy.zyun.vip/https://github.com/",
+      "downHead": "https://proxy.zyun.vip/https://github.com/"
+    },
+    {
+      "bodyHead": "https://gh.con.sh/https://github.com/",
+      "downHead": "https://gh.con.sh/https://github.com/"
+    },
+    {
+      "bodyHead": "https://ghdl.feizhuqwq.cf/https://github.com/",
+      "downHead": "https://ghdl.feizhuqwq.cf/https://github.com/"
+    }
+  ]
+}

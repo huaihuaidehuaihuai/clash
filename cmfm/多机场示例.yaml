@@ -1,0 +1,106 @@
+proxies:
+
+#此处用来放本地免流配置，本地免流只能免80/443端口的TCP，其他连接（包括所有udp）不行
+  - name: "百度免流"
+    type: http
+    server: 157.0.148.53
+    port: 443
+    headers:
+      X-T5-Auth: "1962898709"
+      User-Agent:
+        "okhttp/3.11.0 Dalvik/2.1.0 (Linux; U; Android 11; Redmi K30 5G Build/RKQ1.200826.002)
+        baiduboxapp/11.0.5.12 (Baidu; P1 11)"
+
+proxy-providers:
+  
+  机场1:
+    type: http
+    url: ""
+    path: ./ProxyProviders/机场1.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  机场2:
+    type: http
+    url: ""
+    path: ./ProxyProviders/机场2.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  机场3:
+    type: http
+    url: ""
+    path: ./ProxyProviders/机场3.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  机场4:
+    type: http
+    url: ""
+    path: ./ProxyProviders/机场4.yaml
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+
+proxy-groups:
+  - name: DNS
+    type: select
+    proxies:
+      - DIRECT
+      - 百度免流
+  - name: Proxy
+    type: select
+    proxies:
+      - 机场1
+      - 机场2
+      - 机场3
+      - 机场4
+      - 机场1自动选择
+      - 机场2故障转移
+      - 机场3负载均衡
+      - DIRECT
+  - name: 机场1
+    type: select
+    use:
+      - 机场1
+  - name: 机场2
+    type: select
+    use:
+      - 机场2
+  - name: 机场3
+    type: select
+    use:
+      - 机场3
+  - name: 机场1自动选择
+    type: url-test
+    use:
+      - 机场1
+    tolerance: 50
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+  - name: 机场2故障转移
+    type: fallback
+    use:
+      - 机场2
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+  - name: 机场3负载均衡
+    type: load-balance
+    use:
+      - 机场3
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    strategy: consistent-hashing # 可选 round-robin 和 sticky-sessions
+  - name: Domestic
+    type: select
+    proxies:
+      - DIRECT
+      - 免流国内
+      - Proxy

@@ -1,0 +1,209 @@
+mixed-port: 11223
+allow-lan: true
+geodata-mode: true
+unified-delay: true
+mode: rule
+log-level: debug
+ipv6: true
+udp: true
+tcp-concurrent: false
+enable-process: false
+sniffer:
+  enable: true
+  sniffing:
+    - tls
+    - http
+  skip-domain:
+    - 'Mijia Cloud'
+    - 'dlg.io.mi.com'
+    - '+.apple.com'
+    - '*.baidu.com'
+  force-domain:
+    - 'google.com'
+profile:
+  store-selected: true
+  store-fake-ip: true
+external-controller: 127.0.0.1:9091
+secret: 'clash'
+external-ui: ClashDashboard/YacdMeta
+geox-url:
+  geoip: 'https://raw.githubusercontent.com/Loyalsoldier/geoip/release/geoip-only-cn-private.dat'
+  geosite: 'https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/geosite.dat'
+  mmdb: 'https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country.mmdb'
+tun:
+  enable: true
+  device: Meta
+  stack: gvisor
+  dns-hijack:
+    - any:53
+  auto-route: true
+  auto-detect-interface: true
+  strict-route: false
+dns:
+  enable: true
+  ipv6: true
+  listen: 0.0.0.0:1053
+  use-hosts: true
+  enhanced-mode: redir-host
+  # enhanced-mode: fake-ip
+  # fake-ip-range: 28.0.0.1/8
+  # fake-ip-filter:
+  #   - "*"
+  #   - "+.lan"
+  #   - "+.stun.*.*"
+  #   - "+.stun.*.*.*"
+  #   - "+.stun.*.*.*.*"
+  #   - "+.stun.*.*.*.*.*"
+  #   - lens.l.google.com
+  #   - '*.mcdn.bilivideo.cn'
+  #   - 'connect.rom.miui.com'
+  #   - 'localhost.ptlogin2.qq.com'
+  #   - '+.msftnsci.com'
+  #   - '+.msftconnecttest.com'
+  default-nameserver:
+    - '114.114.114.114#REJECT'
+  proxy-server-nameserver:
+    - 'https://1.12.12.12/dns-query#DNS'        # dnspod
+    - 'https://223.5.5.5/dns-query#DNS'         # alidns
+    # 非免流佬或有支持 udp 本地免流方案的可以换用下面的
+    # - '119.29.29.29#DNS'
+    # - '223.5.5.5#DNS'
+  nameserver:
+    - 'tcp://1.0.0.1#Proxy'           # CF
+    - 'tcp://8.8.4.4#Proxy'           # google
+  fallback:
+    - '119.29.29.29#Domestic'   # dnspod
+    - '223.5.5.5#Domestic'      # alidns
+  fallback-filter:
+    geoip: true
+    geoip-code: '!CN'
+    geosite: 
+      - 'CN'
+      - 'bilibili'
+      - 'tiktok'
+      - 'douyu'
+      - 'huya'
+      - 'category-games@cn'
+      - 'tencent'
+      - 'apple-cn'
+    domain:
+      - '+.bidiys.cc'
+      - '+.xinhuanet.com'
+      - '+.81.cn'
+      - '+.news.cn'
+
+proxies:
+
+#此处用来放本地免流配置，本地免流只能免80/443端口的TCP，其他连接（包括所有udp）不行
+  - name: BaiduProxy
+    type: http
+    server: 157.0.148.53
+    port: 443
+    headers:
+      X-T5-Auth: "1962898709"
+      User-Agent:
+        "okhttp/3.11.0 Dalvik/2.1.0 (Linux; U; Android 11; Redmi K30 5G Build/RKQ1.200826.002)
+        baiduboxapp/11.0.5.12 (Baidu; P1 11)"
+
+proxy-providers:
+  
+  机场:
+    type: http
+    url: "这里填写你的订阅地址"
+    path: ./ProxyProviders/机场.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  本地:
+    type: file
+    path: ./ProxyProviders/本地.yaml
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  
+proxy-groups:
+  - name: DNS
+    type: select
+    proxies:
+      - DIRECT
+      - BaiduProxy
+  - name: Proxy
+    type: select
+    proxies:
+      - 机场
+      - 本地
+      - 机场自动
+      - 本地自动
+      - DIRECT
+  - name: 机场
+    type: select
+    use:
+      - 机场
+  - name: 本地
+    type: select
+    use:
+      - 本地
+  - name: 机场自动
+    type: url-test
+    use:
+      - 机场
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+  - name: 本地自动
+    type: url-test
+    use:
+      - 本地
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+  - name: Domestic
+    type: select
+    proxies:
+      - DIRECT
+      - Proxy
+
+rule-providers:
+    
+rules:
+  # 域名规则
+  # 特殊域名放行
+  - DOMAIN-KEYWORD,announce,DIRECT
+  - DOMAIN-KEYWORD,torrent,DIRECT
+  - DOMAIN-KEYWORD,tracker,DIRECT
+  - DOMAIN-SUFFIX,smtp,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  # 抢跑规则
+  - GEOSITE,bytedance@!cn,Proxy
+  # GEOSITE 直连放行
+  - GEOSITE,category-games@cn,Domestic
+  - GEOSITE,bytedance,Domestic
+  - GEOSITE,bilibili,Domestic
+  - GEOSITE,douyu,Domestic
+  - GEOSITE,huya,Domestic
+  - GEOSITE,tencent,Domestic
+  - GEOSITE,apple-cn,Domestic
+  - GEOSITE,ehentai,Domestic
+  # 强制直连域名
+  - DOMAIN-SUFFIX,'bidiys.cc',Domestic
+  - DOMAIN-SUFFIX,'81.cn',Domestic
+  - DOMAIN-SUFFIX,'xinhuanet.com',Domestic
+  - DOMAIN-SUFFIX,'news.cn',Domestic
+  - DOMAIN-SUFFIX,'ypojie.com',Domestic
+  # GEOSITE 代理
+  - GEOSITE,google,Proxy
+  - GEOSITE,microsoft,Proxy
+  # 兜底规则
+  - GEOSITE,CN,Domestic
+  # IP 规则
+  - GEOIP,PRIVATE,DIRECT,no-resolve
+  # mosdns 规则
+  - IP-CIDR,120.53.53.53/32,DIRECT,no-resolve
+  - IP-CIDR,223.5.5.5/32,DIRECT,no-resolve
+  - IP-CIDR,8.8.8.8/32,Proxy,no-resolve
+  - IP-CIDR,1.1.1.1/32,Proxy,no-resolve
+  # 兜底规则
+  - GEOIP,CN,Domestic
+  - MATCH,Proxy
